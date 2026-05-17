@@ -7,6 +7,7 @@ import datetime
 sys.path.append(os.path.dirname(__file__))
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from modules.gaussian import gaussian_page
 from modules.laser_simulation import laser_page
@@ -29,6 +30,30 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def disable_browser_translation():
+    components.html(
+        """
+        <script>
+        const doc = window.parent.document;
+        const ensureMeta = () => {
+          if (!doc.querySelector('meta[name="google"][content="notranslate"]')) {
+            const meta = doc.createElement('meta');
+            meta.name = 'google';
+            meta.content = 'notranslate';
+            doc.head.appendChild(meta);
+          }
+          doc.documentElement.setAttribute('translate', 'no');
+          doc.documentElement.classList.add('notranslate');
+          doc.body.setAttribute('translate', 'no');
+          doc.body.classList.add('notranslate');
+        };
+        ensureMeta();
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
 def inject_css():
     st.markdown("""
     <style>
@@ -36,6 +61,10 @@ def inject_css():
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif !important;
+    }
+
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {
+        translate: no;
     }
 
     /* ── Hide default Streamlit chrome ── */
@@ -721,6 +750,7 @@ def track_module(name):
     st.session_state["sim_count"] += 1
 
 def main():
+    disable_browser_translation()
     inject_css()
 
     if "page" not in st.session_state:
