@@ -424,7 +424,7 @@
     <div class="demo-window fade-up">
       <div class="demo-titlebar">
         <div class="demo-dots"><div class="demo-dot r"></div><div class="demo-dot y"></div><div class="demo-dot g"></div></div>
-        <div class="demo-url-bar" id="demo-url">localhost:5000 — SciPRO · Accueil</div>
+        <div class="demo-url-bar" id="demo-url">projetappweb.streamlit.app — SciPRO · Accueil</div>
       </div>
       <div class="demo-app">
         <!-- SIDEBAR -->
@@ -769,7 +769,7 @@
 
 <script>
   // ── Lier les boutons "app-link" vers l'app Streamlit ──
-  const APP_URL = window.location.protocol + '//' + window.location.hostname + ':5000';
+  const APP_URL = 'https://projetappweb-ujrw9b4bbewcuderht4xlj.streamlit.app/';
   document.querySelectorAll('.app-link').forEach(el => { el.href = APP_URL; el.target = '_blank'; });
 
   // ── Scroll fade-up ──
@@ -811,7 +811,7 @@
   function switchPanel(name, btnEl) {
     document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
-    document.getElementById('demo-url').textContent = 'localhost:5000 — SciPRO · ' + panels[name];
+    document.getElementById('demo-url').textContent = 'projetappweb.streamlit.app — SciPRO · ' + panels[name];
     if (btnEl) {
       document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
       btnEl.classList.add('active');
