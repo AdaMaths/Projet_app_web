@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.log
+.env
+.agents/
+.config/
+.local/
+artifacts/
+venv/
+.streamlit/
+.idea/
+.vscode/
+modules/*.pkl

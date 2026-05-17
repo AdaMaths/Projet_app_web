@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SciPRO — Application de Calcul Scientifique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:    #0a1628;
+      --navy2:   #0f2040;
+      --blue:    #1d4ed8;
+      --blue2:   #3b82f6;
+      --cyan:    #06b6d4;
+      --emerald: #10b981;
+      --amber:   #f59e0b;
+      --indigo:  #6366f1;
+      --text:    #0f172a;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --surface: #f8fafc;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #fff; line-height: 1.6; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(255,255,255,0.88); backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .nav-logo-name { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-link {
+      font-size: 0.85rem; font-weight: 500; color: var(--muted);
+      text-decoration: none; padding: 6px 12px; border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .nav-link:hover { color: var(--text); background: var(--surface); }
+    .nav-cta {
+      background: var(--blue) !important; color: #fff !important;
+      padding: 8px 18px !important; border-radius: 8px !important;
+      font-weight: 600 !important; transition: background .15s, transform .15s !important;
+    }
+    .nav-cta:hover { background: #1e40af !important; transform: translateY(-1px) !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(165deg, var(--navy) 0%, var(--navy2) 55%, #0d2a5e 100%);
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 1.5rem 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(99,102,241,0.12) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.04;
+      background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content { position: relative; max-width: 800px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);
+      color: #93c5fd; padding: 6px 14px; border-radius: 99px;
+      font-size: 0.78rem; font-weight: 600; margin-bottom: 28px;
+    }
+    .hero-badge-dot { width: 6px; height: 6px; background: var(--blue2); border-radius: 50%; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 800; color: #fff;
+      line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 22px;
+    }
+    .hero h1 span { color: var(--blue2); }
+    .hero-sub { font-size: clamp(1rem, 2vw, 1.15rem); color: #94a3b8; max-width: 560px; margin: 0 auto 40px; }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blue); color: #fff; padding: 14px 28px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600; text-decoration: none;
+      transition: background .15s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(29,78,216,0.4);
+    }
+    .btn-primary:hover { background: #1e40af; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(29,78,216,0.5); }
+    .btn-outline {
+      background: transparent; color: #e2e8f0; padding: 14px 28px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px;
+      margin-top: 64px; padding-top: 48px;
+      border-top: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap;
+    }
+    .hero-stat-num { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+    .hero-stat-label { font-size: 0.78rem; color: #64748b; margin-top: 4px; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 96px 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--blue); background: #eff6ff; border: 1px solid #bfdbfe;
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 16px;
+    }
+    .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 14px; }
+    .section-sub { font-size: 1rem; color: var(--muted); max-width: 520px; }
+
+    /* ── DEMO SECTION ── */
+    .demo { background: var(--navy); padding: 96px 1.5rem; overflow: hidden; }
+    .demo .section-tag { color: #60a5fa; background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.25); }
+    .demo .section-title { color: #f1f5f9; }
+    .demo .section-sub { color: #64748b; }
+    .demo-tabs {
+      display: flex; gap: 8px; margin: 40px 0 24px;
+    }
+    .demo-tab {
+      padding: 8px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+      color: #64748b; background: transparent; transition: all .2s;
+    }
+    .demo-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .demo-tab:hover:not(.active) { border-color: rgba(255,255,255,0.25); color: #94a3b8; }
+    .demo-window {
+      background: #0d1f3c; border: 1px solid #1e3a5f;
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .demo-titlebar {
+      background: #071020; padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid #1e3a5f;
+    }
+    .demo-dots { display: flex; gap: 6px; }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .demo-dot.r { background: #ef4444; } .demo-dot.y { background: #f59e0b; } .demo-dot.g { background: #22c55e; }
+    .demo-url-bar {
+      flex: 1; background: #0a1628; border: 1px solid #1e3a5f;
+      border-radius: 6px; padding: 5px 12px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #475569;
+    }
+    .demo-app {
+      display: flex; height: 520px;
+    }
+    /* Sidebar */
+    .demo-sidebar {
+      width: 220px; background: #071020; border-right: 1px solid #1e3a5f;
+      padding: 16px; flex-shrink: 0;
+    }
+    .demo-sb-logo {
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 16px; border-bottom: 1px solid #1e3a5f; margin-bottom: 16px;
+    }
+    .demo-sb-logo-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+    }
+    .demo-sb-name { font-size: 0.82rem; font-weight: 700; color: #f1f5f9; }
+    .demo-sb-sub  { font-size: 0.62rem; color: #475569; }
+    .demo-sb-section { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #334155; margin: 12px 0 6px; }
+    .demo-sb-item {
+      padding: 7px 10px; border-radius: 6px; font-size: 0.75rem; color: #64748b;
+      margin-bottom: 2px; display: flex; align-items: center; gap: 7px;
+    }
+    .demo-sb-item.active { background: #0f2040; color: #93c5fd; }
+    .demo-sb-dot { width: 6px; height: 6px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+    .demo-sb-item.active .demo-sb-dot { background: var(--blue2); }
+    /* Main content panels */
+    .demo-main { flex: 1; background: #f0f4f8; overflow-y: auto; padding: 20px; }
+    .demo-panel { display: none; }
+    .demo-panel.active { display: block; }
+    /* Home panel */
+    .demo-header-bar {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 12px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .demo-header-title { font-size: 0.82rem; font-weight: 700; color: #0f172a; }
+    .demo-header-badge {
+      font-size: 0.65rem; font-weight: 600; color: #16a34a;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .demo-header-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 2s infinite; }
+    .demo-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+    .demo-metric {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;
+      position: relative; overflow: hidden;
+    }
+    .demo-metric::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;border-radius:8px 8px 0 0; }
+    .demo-metric.b::before{background:linear-gradient(90deg,#3b82f6,#60a5fa);}
+    .demo-metric.i::before{background:linear-gradient(90deg,#6366f1,#818cf8);}
+    .demo-metric.a::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+    .demo-metric.e::before{background:linear-gradient(90deg,#10b981,#34d399);}
+    .demo-metric-val { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1; margin-bottom: 2px; }
+    .demo-metric-label { font-size: 0.62rem; color: #64748b; }
+    .demo-cat { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: 8px; }
+    .demo-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+    .demo-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .demo-card-icon { width: 28px; height: 28px; border-radius: 6px; display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0; }
+    .demo-card-icon.p{background:#eff6ff;} .demo-card-icon.m{background:#f5f3ff;} .demo-card-icon.d{background:#ecfdf5;}
+    .demo-card-name { font-size: 0.7rem; font-weight: 700; color: #1e293b; }
+    .demo-card-desc { font-size: 0.6rem; color: #94a3b8; }
+    /* Chart panel */
+    .demo-chart-wrap { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; }
+    .demo-chart-title { font-size:0.8rem; font-weight:700; color:#0f172a; margin-bottom:14px; }
+    .demo-chart { position:relative; height:200px; background:#f8fafc; border-radius:8px; overflow:hidden; }
+    .demo-chart-svg { width:100%; height:100%; }
+    .demo-chart-line {
+      fill:none; stroke:#3b82f6; stroke-width:2.5;
+      stroke-dasharray: 600; stroke-dashoffset: 600;
+      animation: drawLine 2.5s ease forwards;
+    }
+    .demo-chart-line2 {
+      fill:none; stroke:#6366f1; stroke-width:2; opacity:.7;
+      stroke-dasharray: 600; stroke-dashoffset: 600;
+      animation: drawLine 2.5s ease 0.4s forwards;
+    }
+    .demo-chart-area {
+      fill: url(#blueGrad); opacity: .4;
+      stroke: none;
+      clip-path: inset(0 0 0 0);
+    }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    .demo-params { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .demo-param-label { font-size:0.65rem; font-weight:600; color:#475569; margin-bottom:4px; }
+    .demo-slider {
+      width:100%; height:6px; background:#e2e8f0; border-radius:3px; position:relative; cursor:pointer;
+    }
+    .demo-slider-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#3b82f6,#60a5fa); }
+    /* ML panel */
+    .demo-scatter { position:relative; height:200px; background:#f8fafc; border-radius:8px; overflow:hidden; }
+    .demo-scatter-svg { width:100%; height:100%; }
+    .demo-pt { animation: popIn .4s ease both; }
+    @keyframes popIn { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
+    .demo-metrics-row { display:flex; gap:10px; margin-top:12px; }
+    .demo-metric-sm {
+      flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;
+      padding:10px; text-align:center;
+    }
+    .demo-metric-sm-val { font-size:1.1rem; font-weight:800; color:#0f172a; }
+    .demo-metric-sm-label { font-size:0.62rem; color:#64748b; }
+    /* Signal panel */
+    .demo-signal { height:180px; background:#f8fafc; border-radius:8px; overflow:hidden; }
+    .demo-signal-svg { width:100%;height:100%; }
+    .demo-wave { fill:none; stroke:#06b6d4; stroke-width:2; stroke-dasharray:800; stroke-dashoffset:800; animation: drawLine 2s ease forwards; }
+    .demo-wave2 { fill:none; stroke:#f59e0b; stroke-width:1.5; opacity:.6; stroke-dasharray:800; stroke-dashoffset:800; animation: drawLine 2s ease .3s forwards; }
+
+    /* ── FEATURES BENTO ── */
+    .features { background: var(--surface); }
+    .bento { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:52px; }
+    .bento-card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:28px; transition:box-shadow .2s,transform .2s; }
+    .bento-card:hover { box-shadow:0 8px 32px rgba(0,0,0,0.08); transform:translateY(-2px); }
+    .bento-card.wide { grid-column:span 2; }
+    .bento-card.dark { background:var(--navy); border-color:transparent; }
+    .bento-icon { width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:16px; }
+    .bento-icon.blue{background:#eff6ff;} .bento-icon.indigo{background:#f5f3ff;} .bento-icon.emerald{background:#ecfdf5;} .bento-icon.amber{background:#fffbeb;} .bento-icon.cyan{background:#ecfeff;} .bento-icon.white{background:rgba(255,255,255,0.1);}
+    .bento-title { font-size:1rem; font-weight:700; margin-bottom:8px; }
+    .bento-text { font-size:0.85rem; color:var(--muted); line-height:1.6; }
+    .bento-card.dark .bento-text { color:#94a3b8; }
+    .bento-big-num { font-size:3.2rem; font-weight:800; color:var(--blue2); margin-bottom:6px; }
+
+    /* ── MODULES ── */
+    .cat-title { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px;margin-top:36px; }
+    .modules-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px; }
+    .module-card { background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:flex-start;gap:14px;transition:border-color .15s,box-shadow .15s,transform .15s; }
+    .module-card:hover { border-color:var(--blue2);box-shadow:0 4px 16px rgba(59,130,246,0.1);transform:translateY(-2px); }
+    .module-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0; }
+    .module-icon.p{background:#eff6ff;} .module-icon.m{background:#f5f3ff;} .module-icon.d{background:#ecfdf5;}
+    .module-name { font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:4px; }
+    .module-desc { font-size:0.78rem;color:var(--muted); }
+
+    /* ── TECH ── */
+    .tech { background:var(--surface); }
+    .tech-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:48px; }
+    .tech-pill { background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:box-shadow .15s; }
+    .tech-pill:hover { box-shadow:0 4px 12px rgba(0,0,0,0.07); }
+    .tech-pill-icon { font-size:1.6rem; }
+    .tech-pill-name { font-size:0.8rem;font-weight:600;color:var(--text); }
+    .tech-pill-desc { font-size:0.72rem;color:var(--muted);text-align:center; }
+
+    /* ── AUTEUR ── */
+    .auteur { background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%); }
+    .auteur-card {
+      max-width: 700px; margin: 48px auto 0;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px;
+      box-shadow: 0 8px 40px rgba(29,78,216,0.08);
+      display: flex; align-items: center; gap: 32px;
+      flex-wrap: wrap;
+    }
+    .auteur-avatar {
+      width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--blue), var(--indigo));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 16px rgba(29,78,216,0.25);
+    }
+    .auteur-name { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .auteur-role { font-size: 0.85rem; color: var(--blue); font-weight: 600; margin-bottom: 16px; }
+    .auteur-contacts { display: flex; flex-direction: column; gap: 8px; }
+    .auteur-contact {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem; color: var(--muted);
+      text-decoration: none;
+    }
+    .auteur-contact:hover { color: var(--blue); }
+    .auteur-contact-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .auteur-contact-icon.email { background: #eff6ff; }
+    .auteur-contact-icon.phone { background: #ecfdf5; }
+
+    /* ── CTA ── */
+    .cta-section { background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); text-align:center; padding:96px 1.5rem; }
+    .cta-section h2 { font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;color:#fff;margin-bottom:16px; }
+    .cta-section p  { color:#94a3b8;font-size:1rem;margin-bottom:40px; }
+    .cta-actions { display:flex;gap:14px;justify-content:center;flex-wrap:wrap; }
+
+    /* ── FOOTER ── */
+    footer { background:var(--navy); padding:48px 1.5rem; border-top:1px solid rgba(255,255,255,0.06); }
+    .footer-inner { max-width:1100px;margin:0 auto; }
+    .footer-top { display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:32px;padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:28px; }
+    .footer-brand { max-width: 280px; }
+    .footer-logo { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
+    .footer-logo-icon { width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-size:15px; }
+    .footer-logo-name { font-size:0.95rem;font-weight:700;color:#f1f5f9; }
+    .footer-brand-desc { font-size:0.78rem;color:#334155;line-height:1.6; }
+    .footer-col-title { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:12px; }
+    .footer-link  { display:block;font-size:0.82rem;color:#334155;text-decoration:none;padding:3px 0;transition:color .15s; }
+    .footer-link:hover { color:#94a3b8; }
+    .footer-bottom { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px; }
+    .footer-copy { font-size:0.75rem;color:#334155; }
+    .footer-author { font-size:0.75rem;color:#475569; }
+    .footer-author a { color:#60a5fa;text-decoration:none; }
+    .footer-author a:hover { text-decoration:underline; }
+
+    /* ── ANIMATIONS ── */
+    .fade-up { opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease; }
+    .fade-up.visible { opacity:1;transform:translateY(0); }
+    @media(max-width:768px){
+      .bento{grid-template-columns:1fr;} .bento-card.wide{grid-column:span 1;}
+      nav{padding:0 1rem;} .nav-links .nav-link:not(.nav-cta){display:none;}
+      .demo-app{flex-direction:column;height:auto;} .demo-sidebar{width:100%;display:flex;flex-wrap:wrap;gap:8px;padding:12px;}
+      .auteur-card{flex-direction:column;align-items:flex-start;}
+      .demo-metrics{grid-template-columns:repeat(2,1fr);}
+      .demo-cards{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">🔬</div>
+    <span class="nav-logo-name">SciPRO</span>
+  </a>
+  <div class="nav-links">
+    <a href="#demo" class="nav-link">Démo</a>
+    <a href="#fonctionnalites" class="nav-link">Fonctionnalités</a>
+    <a href="#modules" class="nav-link">Modules</a>
+    <a href="#auteur" class="nav-link">Auteur</a>
+    <a href="#" class="nav-link nav-cta app-link">Lancer l'app →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content fade-up">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Application active — v2.0</div>
+    <h1>Calcul Scientifique<br /><span>de niveau professionnel</span></h1>
+    <p class="hero-sub">Une plateforme complète de simulation, d'analyse numérique et de data science. 13 modules spécialisés réunis dans une interface moderne et fluide.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary app-link">Accéder à l'application →</a>
+      <a href="#demo" class="btn-outline">Voir la démo</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num" data-count="13">13</div><div class="hero-stat-label">Modules disponibles</div></div>
+      <div><div class="hero-stat-num" data-count="3">3</div><div class="hero-stat-label">Domaines couverts</div></div>
+      <div><div class="hero-stat-num">∞</div><div class="hero-stat-label">Simulations possibles</div></div>
+      <div><div class="hero-stat-num" data-count="100" data-suffix="%">100%</div><div class="hero-stat-label">Python natif</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DÉMO INTERACTIVE -->
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-tag">Aperçu de l'interface</span>
+      <h2 class="section-title">Explorez l'application</h2>
+      <p class="section-sub">Naviguez entre les différents écrans pour voir comment fonctionne SciPRO.</p>
+    </div>
+    <div class="demo-tabs fade-up">
+      <button class="demo-tab active" onclick="switchPanel('home', this)">🏠 Accueil</button>
+      <button class="demo-tab" onclick="switchPanel('gaussian', this)">📈 Profil Gaussien</button>
+      <button class="demo-tab" onclick="switchPanel('ml', this)">🤖 Data Science</button>
+      <button class="demo-tab" onclick="switchPanel('signal', this)">〰️ Signal</button>
+    </div>
+    <div class="demo-window fade-up">
+      <div class="demo-titlebar">
+        <div class="demo-dots"><div class="demo-dot r"></div><div class="demo-dot y"></div><div class="demo-dot g"></div></div>
+        <div class="demo-url-bar" id="demo-url">localhost:5000 — SciPRO · Accueil</div>
+      </div>
+      <div class="demo-app">
+        <!-- SIDEBAR -->
+        <div class="demo-sidebar">
+          <div class="demo-sb-logo">
+            <div class="demo-sb-logo-icon">🔬</div>
+            <div><div class="demo-sb-name">SciPRO</div><div class="demo-sb-sub">v2.0</div></div>
+          </div>
+          <div class="demo-sb-section">Physique</div>
+          <div class="demo-sb-item" id="sb-gaussian" onclick="switchPanel('gaussian',null)" style="cursor:pointer"><div class="demo-sb-dot"></div>📈 Profil Gaussien</div>
+          <div class="demo-sb-item" style="cursor:pointer"><div class="demo-sb-dot"></div>🔦 Simulation Laser</div>
+          <div class="demo-sb-item" style="cursor:pointer"><div class="demo-sb-dot"></div>🌊 Navier-Stokes</div>
+          <div class="demo-sb-section">Mathématiques</div>
+          <div class="demo-sb-item" style="cursor:pointer"><div class="demo-sb-dot"></div>∫ Intégration</div>
+          <div class="demo-sb-item" style="cursor:pointer"><div class="demo-sb-dot"></div>∂ Éq. Différentielles</div>
+          <div class="demo-sb-section">Data &amp; Signal</div>
+          <div class="demo-sb-item active" id="sb-ml" onclick="switchPanel('ml',null)" style="cursor:pointer"><div class="demo-sb-dot"></div>🤖 Data Science</div>
+          <div class="demo-sb-item" id="sb-signal" onclick="switchPanel('signal',null)" style="cursor:pointer"><div class="demo-sb-dot"></div>〰️ Signal</div>
+        </div>
+        <!-- MAIN PANELS -->
+        <div class="demo-main">
+
+          <!-- HOME -->
+          <div class="demo-panel active" id="panel-home">
+            <div class="demo-header-bar">
+              <div class="demo-header-title">Application de Calcul Scientifique PRO</div>
+              <div class="demo-header-badge"><div class="demo-header-dot"></div>Système opérationnel</div>
+            </div>
+            <div class="demo-metrics">
+              <div class="demo-metric b"><div class="demo-metric-val">13</div><div class="demo-metric-label">Modules disponibles</div></div>
+              <div class="demo-metric i"><div class="demo-metric-val" id="sim-count">0</div><div class="demo-metric-label">Simulations / session</div></div>
+              <div class="demo-metric a"><div class="demo-metric-val" id="session-time">0<small style="font-size:.7rem;font-weight:400;color:#64748b">min</small></div><div class="demo-metric-label">Durée session</div></div>
+              <div class="demo-metric e"><div class="demo-metric-val" id="modules-visited">0</div><div class="demo-metric-label">Modules visités</div></div>
+            </div>
+            <div class="demo-cat">⚛️ Physique &amp; Simulation</div>
+            <div class="demo-cards">
+              <div class="demo-card"><div class="demo-card-icon p">📈</div><div><div class="demo-card-name">Profil Gaussien</div><div class="demo-card-desc">Distribution, μ, σ</div></div></div>
+              <div class="demo-card"><div class="demo-card-icon p">🔦</div><div><div class="demo-card-name">Simulation Laser</div><div class="demo-card-desc">Modes TEM, cavité</div></div></div>
+              <div class="demo-card"><div class="demo-card-icon p">🌊</div><div><div class="demo-card-name">Navier-Stokes</div><div class="demo-card-desc">Mécanique des fluides</div></div></div>
+            </div>
+            <div class="demo-cat">📐 Mathématiques Numériques</div>
+            <div class="demo-cards">
+              <div class="demo-card"><div class="demo-card-icon m">∫</div><div><div class="demo-card-name">Intégration</div><div class="demo-card-desc">Simpson, Gauss</div></div></div>
+              <div class="demo-card"><div class="demo-card-icon m">〜</div><div><div class="demo-card-name">Interpolation</div><div class="demo-card-desc">Lagrange, Splines</div></div></div>
+              <div class="demo-card"><div class="demo-card-icon m">∂</div><div><div class="demo-card-name">Éq. Diff</div><div class="demo-card-desc">RK4, Euler</div></div></div>
+            </div>
+          </div>
+
+          <!-- GAUSSIAN -->
+          <div class="demo-panel" id="panel-gaussian">
+            <div class="demo-chart-wrap">
+              <div class="demo-chart-title">Profil Gaussien — Distribution normale</div>
+              <div class="demo-chart">
+                <svg class="demo-chart-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="demo-chart-area" d="M0,195 C40,195 60,180 100,140 C140,100 160,40 200,25 C240,10 260,10 300,25 C340,40 360,100 400,140 C440,180 460,195 500,195 C540,195 570,195 600,195 Z"/>
+                  <path class="demo-chart-line" d="M0,195 C40,195 60,180 100,140 C140,100 160,40 200,25 C240,10 260,10 300,25 C340,40 360,100 400,140 C440,180 460,195 500,195"/>
+                  <path class="demo-chart-line2" d="M0,195 C30,195 50,190 90,170 C130,150 150,80 180,55 C210,30 230,25 260,30 C290,35 310,70 340,110 C370,150 400,180 440,190 C470,195 530,195 600,195"/>
+                  <line x1="300" y1="0" x2="300" y2="200" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+                  <text x="304" y="14" font-size="9" fill="#94a3b8">μ = 0</text>
+                </svg>
+              </div>
+              <div class="demo-params">
+                <div>
+                  <div class="demo-param-label">Moyenne (μ) — 0.0</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:50%"></div></div>
+                </div>
+                <div>
+                  <div class="demo-param-label">Écart-type (σ) — 1.0</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:35%"></div></div>
+                </div>
+                <div>
+                  <div class="demo-param-label">Amplitude — 1.0</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:60%"></div></div>
+                </div>
+                <div>
+                  <div class="demo-param-label">Nb de points — 500</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:75%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ML -->
+          <div class="demo-panel" id="panel-ml">
+            <div class="demo-chart-wrap">
+              <div class="demo-chart-title">Data Science — Classification (nuage de points)</div>
+              <div class="demo-scatter">
+                <svg class="demo-scatter-svg" viewBox="0 0 600 200">
+                  <script type="text/javascript">
+                  </script>
+                  <!-- Cluster 1 - blue -->
+                  <circle class="demo-pt" cx="120" cy="60"  r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.1s"/>
+                  <circle class="demo-pt" cx="140" cy="80"  r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.15s"/>
+                  <circle class="demo-pt" cx="100" cy="90"  r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.2s"/>
+                  <circle class="demo-pt" cx="160" cy="50"  r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.25s"/>
+                  <circle class="demo-pt" cx="130" cy="110" r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.3s"/>
+                  <circle class="demo-pt" cx="110" cy="130" r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.35s"/>
+                  <circle class="demo-pt" cx="150" cy="140" r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.4s"/>
+                  <circle class="demo-pt" cx="90"  cy="70"  r="5" fill="#3b82f6" opacity=".8" style="animation-delay:.45s"/>
+                  <!-- Cluster 2 - emerald -->
+                  <circle class="demo-pt" cx="370" cy="50"  r="5" fill="#10b981" opacity=".8" style="animation-delay:.1s"/>
+                  <circle class="demo-pt" cx="400" cy="70"  r="5" fill="#10b981" opacity=".8" style="animation-delay:.15s"/>
+                  <circle class="demo-pt" cx="380" cy="90"  r="5" fill="#10b981" opacity=".8" style="animation-delay:.2s"/>
+                  <circle class="demo-pt" cx="420" cy="55"  r="5" fill="#10b981" opacity=".8" style="animation-delay:.25s"/>
+                  <circle class="demo-pt" cx="360" cy="110" r="5" fill="#10b981" opacity=".8" style="animation-delay:.3s"/>
+                  <circle class="demo-pt" cx="410" cy="130" r="5" fill="#10b981" opacity=".8" style="animation-delay:.35s"/>
+                  <circle class="demo-pt" cx="390" cy="150" r="5" fill="#10b981" opacity=".8" style="animation-delay:.4s"/>
+                  <circle class="demo-pt" cx="440" cy="80"  r="5" fill="#10b981" opacity=".8" style="animation-delay:.45s"/>
+                  <!-- Decision boundary -->
+                  <line x1="260" y1="0" x2="270" y2="200" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6" opacity=".5"/>
+                  <text x="265" y="14" font-size="9" fill="#818cf8">Frontière</text>
+                  <!-- Noise -->
+                  <circle cx="260" cy="100" r="5" fill="#f59e0b" opacity=".7"/>
+                  <circle cx="290" cy="140" r="5" fill="#3b82f6" opacity=".6"/>
+                  <circle cx="240" cy="80"  r="5" fill="#10b981" opacity=".6"/>
+                </svg>
+              </div>
+              <div class="demo-metrics-row">
+                <div class="demo-metric-sm"><div class="demo-metric-sm-val" style="color:#3b82f6">94.2%</div><div class="demo-metric-sm-label">Accuracy</div></div>
+                <div class="demo-metric-sm"><div class="demo-metric-sm-val" style="color:#10b981">0.941</div><div class="demo-metric-sm-label">F1-Score</div></div>
+                <div class="demo-metric-sm"><div class="demo-metric-sm-val" style="color:#6366f1">0.988</div><div class="demo-metric-sm-label">AUC-ROC</div></div>
+                <div class="demo-metric-sm"><div class="demo-metric-sm-val" style="color:#f59e0b">KNN</div><div class="demo-metric-sm-label">Modèle</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIGNAL -->
+          <div class="demo-panel" id="panel-signal">
+            <div class="demo-chart-wrap">
+              <div class="demo-chart-title">Analyse du Signal — FFT &amp; Spectre de fréquences</div>
+              <div class="demo-signal">
+                <svg class="demo-signal-svg" viewBox="0 0 600 180">
+                  <path class="demo-wave" d="M0,90 C10,90 15,50 30,50 C45,50 50,130 65,130 C80,130 85,50 100,50 C115,50 120,130 135,130 C150,130 155,50 170,50 C185,50 190,130 205,130 C220,130 225,50 240,50 C255,50 260,130 275,130 C290,130 295,50 310,50 C325,50 330,130 345,130 C360,130 365,50 380,50 C395,50 400,130 415,130 C430,130 435,50 450,50 C465,50 470,130 485,130 C500,130 505,50 520,50 C535,50 540,130 555,130 C570,130 580,90 600,90"/>
+                  <path class="demo-wave2" d="M0,90 C20,90 25,70 50,65 C75,60 80,110 110,115 C140,120 145,65 175,60 C205,55 210,115 240,118 C270,121 275,65 305,60 C335,55 340,115 370,118 C400,121 405,65 435,60 C465,55 480,90 510,92 C540,94 565,90 600,90"/>
+                  <text x="10" y="15" font-size="9" fill="#94a3b8">Signal original</text>
+                  <text x="10" y="27" font-size="9" fill="#f59e0b" opacity=".8">Signal filtré</text>
+                </svg>
+              </div>
+              <div class="demo-params" style="margin-top:12px">
+                <div>
+                  <div class="demo-param-label">Fréquence d'échantillonnage — 1000 Hz</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:65%"></div></div>
+                </div>
+                <div>
+                  <div class="demo-param-label">Fréquence de coupure — 50 Hz</div>
+                  <div class="demo-slider"><div class="demo-slider-fill" style="width:40%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /demo-main -->
+      </div><!-- /demo-app -->
+    </div><!-- /demo-window -->
+  </div>
+</section>
+
+<!-- FONCTIONNALITÉS -->
+<section class="features" id="fonctionnalites">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-tag">Fonctionnalités</span>
+      <h2 class="section-title">Tout ce dont vous avez besoin<br />pour la simulation scientifique</h2>
+      <p class="section-sub">Des outils de calcul puissants dans une interface intuitive, accessibles directement depuis le navigateur.</p>
+    </div>
+    <div class="bento fade-up">
+      <div class="bento-card dark">
+        <div class="bento-icon white">⚡</div>
+        <div class="bento-title" style="color:#f1f5f9">Calcul en temps réel</div>
+        <p class="bento-text">Résultats instantanés avec mise à jour dynamique des graphiques dès que vous modifiez les paramètres.</p>
+      </div>
+      <div class="bento-card">
+        <div class="bento-icon blue">📊</div>
+        <div class="bento-title">Visualisations interactives</div>
+        <p class="bento-text">Graphiques Matplotlib et Plotly intégrés. Exportez vos figures en PNG, SVG ou PDF.</p>
+      </div>
+      <div class="bento-card">
+        <div class="bento-icon indigo">🔬</div>
+        <div class="bento-title">Physique avancée</div>
+        <p class="bento-text">Simulation laser, Navier-Stokes, profils gaussiens et analyse de cavités optiques.</p>
+      </div>
+      <div class="bento-card">
+        <div class="bento-big-num">13</div>
+        <div class="bento-title">Modules spécialisés</div>
+        <p class="bento-text">Physique · Mathématiques · Data Science</p>
+      </div>
+      <div class="bento-card wide">
+        <div class="bento-icon emerald">🤖</div>
+        <div class="bento-title">Machine Learning intégré</div>
+        <p class="bento-text">Régression, clustering, classification et prédiction énergétique via scikit-learn. Visualisation des métriques de performance et des frontières de décision en temps réel.</p>
+      </div>
+      <div class="bento-card">
+        <div class="bento-icon amber">🎛️</div>
+        <div class="bento-title">Paramétrage intuitif</div>
+        <p class="bento-text">Sliders, sélecteurs et formulaires pour chaque paramètre. Aucun code requis.</p>
+      </div>
+      <div class="bento-card">
+        <div class="bento-icon cyan">〰️</div>
+        <div class="bento-title">Traitement du signal</div>
+        <p class="bento-text">FFT, filtres numériques, analyse spectrale et détection de fréquences.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section id="modules">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-tag">Modules</span>
+      <h2 class="section-title">13 modules, 3 domaines</h2>
+      <p class="section-sub">Chaque module est autonome et conçu pour un cas d'usage précis.</p>
+    </div>
+    <div class="fade-up">
+      <div class="cat-title">⚛️ Physique &amp; Simulation</div>
+      <div class="modules-grid">
+        <div class="module-card"><div class="module-icon p">📈</div><div><div class="module-name">Profil Gaussien</div><div class="module-desc">Distribution gaussienne, μ, σ, superposition de pics</div></div></div>
+        <div class="module-card"><div class="module-icon p">🔦</div><div><div class="module-name">Simulation Laser</div><div class="module-desc">Modes TEM, cavité optique, profil de faisceau</div></div></div>
+        <div class="module-card"><div class="module-icon p">🪞</div><div><div class="module-name">Pertes de Cavité</div><div class="module-desc">Transmission, absorption, pertes par diffusion</div></div></div>
+        <div class="module-card"><div class="module-icon p">🌊</div><div><div class="module-name">Navier-Stokes</div><div class="module-desc">Simulation de l'écoulement des fluides visqueux</div></div></div>
+      </div>
+      <div class="cat-title">📐 Mathématiques Numériques</div>
+      <div class="modules-grid">
+        <div class="module-card"><div class="module-icon m">∫</div><div><div class="module-name">Intégration</div><div class="module-desc">Méthodes de Simpson, Gauss-Legendre, Trapèzes</div></div></div>
+        <div class="module-card"><div class="module-icon m">〜</div><div><div class="module-name">Interpolation</div><div class="module-desc">Lagrange, Newton, Splines cubiques</div></div></div>
+        <div class="module-card"><div class="module-icon m">∂</div><div><div class="module-name">Équations Différentielles</div><div class="module-desc">RK4, Euler explicite/implicite, Midpoint</div></div></div>
+        <div class="module-card"><div class="module-icon m">⚙️</div><div><div class="module-name">Optimisation</div><div class="module-desc">Descente de gradient, programmation linéaire PuLP</div></div></div>
+        <div class="module-card"><div class="module-icon m">🔢</div><div><div class="module-name">Hub Numérisation</div><div class="module-desc">Algorithmes numériques fondamentaux</div></div></div>
+      </div>
+      <div class="cat-title">📊 Data Science &amp; Signal</div>
+      <div class="modules-grid">
+        <div class="module-card"><div class="module-icon d">📊</div><div><div class="module-name">Data Science</div><div class="module-desc">Régression, clustering, classification ML</div></div></div>
+        <div class="module-card"><div class="module-icon d">⚡</div><div><div class="module-name">Énergie</div><div class="module-desc">Analyse et prédiction de données énergétiques</div></div></div>
+        <div class="module-card"><div class="module-icon d">〰️</div><div><div class="module-name">Analyse du Signal</div><div class="module-desc">FFT, filtres passe-bas/haut/bande, spectre</div></div></div>
+        <div class="module-card"><div class="module-icon d">🤖</div><div><div class="module-name">Automatique</div><div class="module-desc">Systèmes de contrôle, diagrammes Bode et Nyquist</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGIE -->
+<section class="tech" id="technologie">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-tag">Technologie</span>
+      <h2 class="section-title">Construit sur des bases solides</h2>
+      <p class="section-sub">Un stack Python scientifique de référence, déployé via Streamlit pour une accessibilité maximale.</p>
+    </div>
+    <div class="tech-grid fade-up">
+      <div class="tech-pill"><div class="tech-pill-icon">🐍</div><div class="tech-pill-name">Python 3</div><div class="tech-pill-desc">Langage principal</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">🎈</div><div class="tech-pill-name">Streamlit</div><div class="tech-pill-desc">Interface web interactive</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">📐</div><div class="tech-pill-name">NumPy</div><div class="tech-pill-desc">Calcul numérique</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">📉</div><div class="tech-pill-name">SciPy</div><div class="tech-pill-desc">Algorithmes scientifiques</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">📊</div><div class="tech-pill-name">Matplotlib</div><div class="tech-pill-desc">Visualisation avancée</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">🤖</div><div class="tech-pill-name">Scikit-learn</div><div class="tech-pill-desc">Machine Learning</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">🐼</div><div class="tech-pill-name">Pandas</div><div class="tech-pill-desc">Analyse de données</div></div>
+      <div class="tech-pill"><div class="tech-pill-icon">🎨</div><div class="tech-pill-name">Seaborn</div><div class="tech-pill-desc">Dataviz statistique</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTEUR -->
+<section class="auteur" id="auteur">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;margin-bottom:0">
+      <span class="section-tag">À propos</span>
+      <h2 class="section-title">Auteur du projet</h2>
+      <p class="section-sub" style="margin:0 auto">Développé dans le cadre d'une formation en calcul scientifique et simulation numérique.</p>
+    </div>
+    <div class="auteur-card fade-up">
+      <div class="auteur-avatar">👨‍💻</div>
+      <div>
+        <div class="auteur-name">Adama Gueye</div>
+        <div class="auteur-role">Ingénieur Calcul Scientifique &amp; Data Science</div>
+        <div class="auteur-contacts">
+          <a href="mailto:adama.gueye.3304@gmail.com" class="auteur-contact">
+            <div class="auteur-contact-icon email">✉️</div>
+            adama.gueye.3304@gmail.com
+          </a>
+          <a href="tel:+221777804163" class="auteur-contact">
+            <div class="auteur-contact-icon phone">📱</div>
+            +221 77 780 41 63
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="container fade-up">
+    <h2>Prêt à simuler ?</h2>
+    <p>Accédez immédiatement à l'application — aucune installation requise.</p>
+    <div class="cta-actions">
+      <a href="#" class="btn-primary app-link">Lancer SciPRO →</a>
+      <a href="#demo" class="btn-outline">Revoir la démo</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">🔬</div>
+          <span class="footer-logo-name">SciPRO</span>
+        </div>
+        <p class="footer-brand-desc">Application de calcul scientifique professionnel. Simulation, analyse numérique et data science dans le navigateur.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <a href="#demo" class="footer-link">Démo interactive</a>
+        <a href="#fonctionnalites" class="footer-link">Fonctionnalités</a>
+        <a href="#modules" class="footer-link">Modules</a>
+        <a href="#technologie" class="footer-link">Technologie</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <a href="mailto:adama.gueye.3304@gmail.com" class="footer-link">adama.gueye.3304@gmail.com</a>
+        <a href="tel:+221777804163" class="footer-link">+221 77 780 41 63</a>
+        <div style="margin-top:16px">
+          <div class="footer-col-title">Application</div>
+          <a href="#" class="footer-link app-link">Lancer l'app Streamlit →</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 SciPRO — Application de Calcul Scientifique Professionnelle v2.0</span>
+      <span class="footer-author">Développé par <strong style="color:#94a3b8">Adama Gueye</strong> — <a href="mailto:adama.gueye.3304@gmail.com">adama.gueye.3304@gmail.com</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Lier les boutons "app-link" vers l'app Streamlit ──
+  const APP_URL = window.location.protocol + '//' + window.location.hostname + ':5000';
+  document.querySelectorAll('.app-link').forEach(el => { el.href = APP_URL; el.target = '_blank'; });
+
+  // ── Scroll fade-up ──
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+  // ── Animated counters ──
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const end = parseInt(el.dataset.count), suffix = el.dataset.suffix || '';
+    let start = 0;
+    const timer = setInterval(() => {
+      start = Math.min(start + Math.ceil(end / 60), end);
+      el.textContent = start + suffix;
+      if (start >= end) clearInterval(timer);
+    }, 20);
+  });
+
+  // ── Demo live counters ──
+  let simCount = 0, sessionMin = 0, modulesVisited = 0;
+  setInterval(() => {
+    sessionMin++;
+    document.getElementById('session-time').innerHTML = sessionMin + '<small style="font-size:.7rem;font-weight:400;color:#64748b">min</small>';
+  }, 60000);
+  setInterval(() => {
+    simCount++;
+    document.getElementById('sim-count').textContent = simCount;
+  }, 7000);
+  setInterval(() => {
+    if (modulesVisited < 13) {
+      modulesVisited++;
+      document.getElementById('modules-visited').textContent = modulesVisited;
+    }
+  }, 15000);
+
+  // ── Demo panel switcher ──
+  const panels = { home:'🏠 Accueil', gaussian:'📈 Profil Gaussien', ml:'🤖 Data Science', signal:'〰️ Analyse du Signal' };
+  function switchPanel(name, btnEl) {
+    document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.getElementById('demo-url').textContent = 'localhost:5000 — SciPRO · ' + panels[name];
+    if (btnEl) {
+      document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+    // Update sidebar active item
+    document.querySelectorAll('.demo-sb-item').forEach(i => i.classList.remove('active'));
+    const sbMap = { gaussian:'sb-gaussian', ml:'sb-ml', signal:'sb-signal' };
+    if (sbMap[name]) document.getElementById(sbMap[name]).classList.add('active');
+    // Bump sim counter
+    simCount++;
+    document.getElementById('sim-count').textContent = simCount;
+  }
+</script>
+</body>
+</html>

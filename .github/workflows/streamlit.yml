@@ -1,0 +1,65 @@
+name: Streamlit CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # =========================
+      # Clone repository
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # Python
+      # =========================
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # =========================
+      # Install dependencies
+      # =========================
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # =========================
+      # Test imports
+      # =========================
+      - name: Test Python imports
+        run: |
+          python -c "import streamlit"
+          python -c "import numpy"
+          python -c "import pandas"
+          python -c "import scipy"
+          python -c "import sklearn"
+          python -c "import plotly"
+
+      # =========================
+      # Check Streamlit app
+      # =========================
+      - name: Check Streamlit App
+        run: |
+          test -f streamlit_app.py
+
+      # =========================
+      # Success
+      # =========================
+      - name: CI Success
+        run: echo "✅ Streamlit application validée"
