@@ -1,10 +1,13 @@
 streamlit
-flask
-scikit-learn
-pandas
 numpy
+pandas
+scipy
 matplotlib
+plotly
 seaborn
+scikit-learn
 joblib
 xgboost
 openpyxl
+flask
+gunicorn
